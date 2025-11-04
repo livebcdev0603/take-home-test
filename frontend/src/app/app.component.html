@@ -1,23 +1,27 @@
 <main class="loans">
   <section class="loans--container">
     <h1>Loan Management</h1>
-    <table>
-      <thead>
-        <tr>
-          <th>Loan Amount</th>
-          <th>Current Balance</th>
-          <th>Applicant</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let loan of loans">
-          <td>{{ loan.amount | currency }}</td>
-          <td>{{ loan.currentBalance | currency }}</td>
-          <td>{{ loan.applicantName }}</td>
-          <td>{{ loan.status }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-wrapper">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Loan Amount</th>
+              <th>Current Balance</th>
+              <th>Applicant</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let loan of loans">
+              <td>{{ loan.amount | currency }}</td>
+              <td>{{ loan.currentBalance | currency }}</td>
+              <td>{{ loan.applicantName }}</td>
+              <td>{{ loan.status }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </section>
 </main>
