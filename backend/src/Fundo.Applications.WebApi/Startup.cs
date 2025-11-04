@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using Fundo.Applications.WebApi.Data;
 using Fundo.Applications.WebApi.Models;
 
