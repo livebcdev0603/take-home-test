@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Fundo.Applications.WebApi.Data;
 using Fundo.Applications.WebApi.Models;
 using Fundo.Applications.WebApi.DTOs;
