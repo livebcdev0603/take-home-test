@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
@@ -11,12 +12,12 @@ using Fundo.Applications.WebApi.DTOs;
 
 namespace Fundo.Services.Tests.Integration
 {
-    public class LoanManagementControllerTests : IClassFixture<WebApplicationFactory<Fundo.Applications.WebApi.Startup>>
+    public class LoanManagementControllerTests : IClassFixture<WebApplicationFactory<Fundo.Applications.WebApi.Program>>
     {
         private readonly HttpClient _client;
-        private readonly WebApplicationFactory<Fundo.Applications.WebApi.Startup> _factory;
+        private readonly WebApplicationFactory<Fundo.Applications.WebApi.Program> _factory;
 
-        public LoanManagementControllerTests(WebApplicationFactory<Fundo.Applications.WebApi.Startup> factory)
+        public LoanManagementControllerTests(WebApplicationFactory<Fundo.Applications.WebApi.Program> factory)
         {
             _factory = factory;
             _client = factory.WithWebHostBuilder(builder =>
@@ -32,7 +33,7 @@ namespace Fundo.Services.Tests.Integration
 
                     services.AddDbContext<LoanDbContext>(options =>
                     {
-                        options.UseInMemoryDatabase("TestDb");
+                        options.UseInMemoryDatabase($"TestDb_{Guid.NewGuid()}");
                     });
                 });
             }).CreateClient(new WebApplicationFactoryClientOptions
