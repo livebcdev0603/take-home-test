@@ -49,8 +49,27 @@ namespace Fundo.Applications.WebApi
             using (var scope = app.ApplicationServices.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<LoanDbContext>();
-                context.Database.EnsureCreated();
-                SeedData(context);
+                var retries = 0;
+                var maxRetries = 10;
+                
+                while (retries < maxRetries)
+                {
+                    try
+                    {
+                        context.Database.EnsureCreated();
+                        SeedData(context);
+                        break;
+                    }
+                    catch (Microsoft.Data.SqlClient.SqlException ex) when (ex.Number == -2 || ex.Number == 2)
+                    {
+                        retries++;
+                        if (retries >= maxRetries)
+                        {
+                            throw;
+                        }
+                        System.Threading.Thread.Sleep(2000);
+                    }
+                }
             }
 
             app.UseRouting();

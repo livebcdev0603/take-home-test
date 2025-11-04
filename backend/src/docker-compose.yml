@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -12,6 +10,12 @@ services:
       - "1433:1433"
     volumes:
       - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P YourStrong@Passw0rd -Q "SELECT 1" || exit 1
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
 
   api:
     build:
@@ -19,7 +23,8 @@ services:
       dockerfile: Fundo.Applications.WebApi/Dockerfile
     container_name: loanmanagement-api
     depends_on:
-      - sqlserver
+      sqlserver:
+        condition: service_healthy
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=LoanManagementDb;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;
