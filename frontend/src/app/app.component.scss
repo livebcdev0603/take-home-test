@@ -12,6 +12,8 @@
   h1 {
     color: black;
     margin-bottom: 20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
     text-align: center;
     width: 100%;
   }
@@ -25,10 +27,10 @@
     thead {
       tr {
         th {
-          padding: 12px;
+          padding: 16px;
           text-align: left;
           border-bottom: 1px solid #d0d0d0;
-          color: black;
+          color: #6b6b6b;
           font-weight: normal;
         }
       }
@@ -44,7 +46,7 @@
         }
 
         td {
-          padding: 12px;
+          padding: 16px;
           color: black;
         }
       }
