@@ -32,6 +32,19 @@ services:
       - "5000:80"
       - "5001:443"
 
+  test:
+    image: mcr.microsoft.com/dotnet/sdk:6.0
+    container_name: loanmanagement-test
+    working_dir: /src
+    volumes:
+      - .:/src
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=LoanManagementDb;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;
+    command: dotnet test
+s
 volumes:
   sqlserver_data:
 
