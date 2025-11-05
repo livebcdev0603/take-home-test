@@ -12,18 +12,25 @@ using Fundo.Applications.WebApi.DTOs;
 
 namespace Fundo.Services.Tests.Integration
 {
-    public class LoanManagementControllerTests : IClassFixture<WebApplicationFactory<Fundo.Applications.WebApi.Program>>
+    public class LoanManagementControllerTests : IClassFixture<WebApplicationFactory<Fundo.Applications.WebApi.ProgramMarker>>
     {
-        private readonly HttpClient _client;
-        private readonly WebApplicationFactory<Fundo.Applications.WebApi.Program> _factory;
+        private readonly WebApplicationFactory<Fundo.Applications.WebApi.ProgramMarker> _factory;
 
-        public LoanManagementControllerTests(WebApplicationFactory<Fundo.Applications.WebApi.Program> factory)
+        public LoanManagementControllerTests(WebApplicationFactory<Fundo.Applications.WebApi.ProgramMarker> factory)
         {
             _factory = factory;
-            _client = factory.WithWebHostBuilder(builder =>
+        }
+
+        private HttpClient CreateClient()
+        {
+            // Create a unique database name for each test method
+            var databaseName = $"TestDb_{Guid.NewGuid()}";
+            
+            return _factory.WithWebHostBuilder(builder =>
             {
                 builder.ConfigureServices(services =>
                 {
+                    // Remove the existing DbContext registration
                     var descriptor = services.SingleOrDefault(
                         d => d.ServiceType == typeof(DbContextOptions<LoanDbContext>));
                     if (descriptor != null)
@@ -31,9 +38,18 @@ namespace Fundo.Services.Tests.Integration
                         services.Remove(descriptor);
                     }
 
+                    // Remove the DbContext service itself
+                    var dbContextDescriptor = services.SingleOrDefault(
+                        d => d.ServiceType == typeof(LoanDbContext));
+                    if (dbContextDescriptor != null)
+                    {
+                        services.Remove(dbContextDescriptor);
+                    }
+
+                    // Add the in-memory database with a unique name per test
                     services.AddDbContext<LoanDbContext>(options =>
                     {
-                        options.UseInMemoryDatabase($"TestDb_{Guid.NewGuid()}");
+                        options.UseInMemoryDatabase(databaseName);
                     });
                 });
             }).CreateClient(new WebApplicationFactoryClientOptions
@@ -45,7 +61,8 @@ namespace Fundo.Services.Tests.Integration
         [Fact]
         public async Task GetAllLoans_ShouldReturnOk()
         {
-            var response = await _client.GetAsync("/loans");
+            using var client = CreateClient();
+            var response = await client.GetAsync("/loans");
 
             Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
         }
@@ -53,13 +70,14 @@ namespace Fundo.Services.Tests.Integration
         [Fact]
         public async Task CreateLoan_ShouldReturnCreated()
         {
+            using var client = CreateClient();
             var loanDto = new CreateLoanDto
             {
                 Amount = 10000m,
                 ApplicantName = "Test User"
             };
 
-            var response = await _client.PostAsJsonAsync("/loans", loanDto);
+            var response = await client.PostAsJsonAsync("/loans", loanDto);
 
             Assert.Equal(System.Net.HttpStatusCode.Created, response.StatusCode);
         }
@@ -67,7 +85,8 @@ namespace Fundo.Services.Tests.Integration
         [Fact]
         public async Task GetLoanById_ShouldReturnNotFound_WhenLoanDoesNotExist()
         {
-            var response = await _client.GetAsync("/loans/999");
+            using var client = CreateClient();
+            var response = await client.GetAsync("/loans/999");
 
             Assert.Equal(System.Net.HttpStatusCode.NotFound, response.StatusCode);
         }
@@ -75,17 +94,19 @@ namespace Fundo.Services.Tests.Integration
         [Fact]
         public async Task MakePayment_ShouldUpdateBalance()
         {
+            using var client = CreateClient();
             var loanDto = new CreateLoanDto
             {
                 Amount = 10000m,
                 ApplicantName = "Test User"
             };
 
-            var createResponse = await _client.PostAsJsonAsync("/loans", loanDto);
+            var createResponse = await client.PostAsJsonAsync("/loans", loanDto);
+            createResponse.EnsureSuccessStatusCode();
             var loan = await createResponse.Content.ReadFromJsonAsync<Fundo.Applications.WebApi.Models.Loan>();
 
             var paymentDto = new PaymentDto { Amount = 2000m };
-            var paymentResponse = await _client.PostAsJsonAsync($"/loans/{loan.Id}/payment", paymentDto);
+            var paymentResponse = await client.PostAsJsonAsync($"/loans/{loan.Id}/payment", paymentDto);
 
             Assert.Equal(System.Net.HttpStatusCode.OK, paymentResponse.StatusCode);
             var updatedLoan = await paymentResponse.Content.ReadFromJsonAsync<Fundo.Applications.WebApi.Models.Loan>();

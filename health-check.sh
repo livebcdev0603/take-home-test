@@ -58,19 +58,8 @@ else
 fi
 echo ""
 
-# Check if .NET SDK is available (for running tests)
-echo "5. Checking .NET SDK..."
-if command -v dotnet &> /dev/null; then
-    DOTNET_VERSION=$(dotnet --version)
-    echo -e "${GREEN}✓ .NET SDK is installed (version $DOTNET_VERSION)${NC}"
-else
-    echo -e "${YELLOW}⚠ .NET SDK is not installed${NC}"
-    echo "   Tests can be run with: cd backend/src && dotnet test"
-fi
-echo ""
-
 # Check if Node.js is available
-echo "6. Checking Node.js..."
+echo "5. Checking Node.js..."
 if command -v node &> /dev/null; then
     NODE_VERSION=$(node --version)
     echo -e "${GREEN}✓ Node.js is installed (version $NODE_VERSION)${NC}"

@@ -28,4 +28,7 @@ namespace Fundo.Applications.WebApi
                 .UseStartup<Startup>();
         }
     }
+
+    // Marker class for integration testing
+    public class ProgramMarker { }
 }

@@ -44,7 +44,7 @@ services:
     environment:
       - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=LoanManagementDb;User Id=sa;Password=YourStrong@Passw0rd;TrustServerCertificate=True;
     command: dotnet test
-s
+
 volumes:
   sqlserver_data:
 
